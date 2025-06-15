@@ -1,56 +1,56 @@
-import axios from 'axios';
-import { type Note } from '../types/note';
+import axios from "axios";
+import type { Note } from "../types/note";
 
-const API_BASE_URL = 'https://notehub-public.goit.study/api';
+const API_KEY = import.meta.env.VITE_NOTEHUB_TOKEN;
+const API_URL = 'https://notehub-public.goit.study/api/notes';
 
-export interface FetchNotesResponse {
-  data: Note[];
-  total: number;
+
+interface NotesResponse {
+  notes: Note[];
   page: number;
-  perPage: number;
+  totalPages: number;
 }
 
-export interface FetchNotesParams {
-  page?: number;
-  perPage?: number;
-  search?: string;
-}
-
-export const fetchNotes = async (_currentPage: number, _p0: number, _debouncedSearchQuery: string, params: FetchNotesParams = {}): Promise<FetchNotesResponse> => {
-  const token = import.meta.env.VITE_NOTEHUB_TOKEN;
-  const response = await axios.get<FetchNotesResponse>(`${API_BASE_URL}/notes`, {
-    params: {
-      page: params.page || 1,
-      perPage: params.perPage || 12,
-      search: params.search || undefined,
-    },
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response.data;
-};
-
-export const createNote = async (noteData: {
+export interface NewNoteData {
   title: string;
-  content: string;
-  tag: string;
-}): Promise<Note> => {
-  const token = import.meta.env.VITE_NOTEHUB_TOKEN;
-  const response = await axios.post<Note>(`${API_BASE_URL}/notes`, noteData, {
+  content?: string;
+  tag: 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping';
+}
+
+export const fetchNotes = async (
+  search?: string,
+  page = 1,
+  perPage = 12
+): Promise<NotesResponse> => {
+  const response = await axios.get<NotesResponse>(API_URL, {
+    params: {
+      ...(search ? { search } : {}),
+      page,
+      perPage,
+    },
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${API_KEY}`,
     },
   });
   return response.data;
 };
 
-export const DeleteNote = async (id: string): Promise<Note> => {
-  const token = import.meta.env.VITE_NOTEHUB_TOKEN;
-  const response = await axios.delete<Note>(`${API_BASE_URL}/notes/${id}`, {
+export const createNote = async (noteData: NewNoteData): Promise<Note> => {
+  const response = await axios.post<Note>(API_URL, noteData, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${API_KEY}`,
     },
   });
+
+  return response.data;
+};
+
+export const deleteNote = async (noteId: number): Promise<Note> => {
+  const response = await axios.delete(`${API_URL}/${noteId}`, {
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+    },
+  });
+
   return response.data;
 };

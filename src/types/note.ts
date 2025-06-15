@@ -1,9 +1,10 @@
-export interface Note {
+export interface Note { 
+  updatedAt: string; // Дата ласт обновы
   id: number;
-  title: string; // Заголовок нотатки
-  content: string; // Текст нотатки
-  createdAt: string; // Дата створення
-  updatedAt: string; // Дата останнього оновлення
+  createdAt: string; // Дата создания
+  content: string; // Текст заметок
+  title: string; // Заголовок заметки
+ 
   tag: NoteTag;
 }
 

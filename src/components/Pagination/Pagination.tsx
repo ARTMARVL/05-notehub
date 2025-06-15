@@ -3,31 +3,32 @@ import css from "./Pagination.module.css";
 
 interface PaginationProps {
   pageCount: number;
-  currentPage: number;
-  onPageChange: ({ selected }: { selected: number }) => void;
+  page: number; // Исправлено: page вместо currentPage
+  onPageChange: (page: number) => void; // Принимает просто число
 }
 
 export default function Pagination({
   pageCount,
-  currentPage,
+  page,
   onPageChange,
 }: PaginationProps) {
-  if (pageCount <= 1) {
-    return null;
-  }
+  if (pageCount <= 1) return null;
+
+  const handlePageChange = ({ selected }: { selected: number }) => {
+    onPageChange(selected + 1); // ReactPaginate использует индексацию с 0
+  };
 
   return (
     <ReactPaginate
-      pageCount={pageCount} // Загальна кількість сторінок
-      pageRangeDisplayed={5} // Кількість видимих номерів сторінок
-      marginPagesDisplayed={1} // Кількість номерів сторінок по краях
-      onPageChange={onPageChange} // Обробник зміни сторінки
-      forcePage={currentPage - 1} // Примусово встановлює активну сторінку (ReactPaginate використовує 0-індексацію)
-      containerClassName={css.pagination} // Клас для контейнера пагінації
-      activeClassName={css.active} // Клас для активної сторінки
-      nextLabel="→" // Текст для кнопки "Наступна"
-      previousLabel="←" // Текст для кнопки "Попередня"
-      // Додаткові класи для вимкнених кнопок
+      pageCount={pageCount}
+      pageRangeDisplayed={5}
+      marginPagesDisplayed={1}
+      onPageChange={handlePageChange}
+      forcePage={page - 1}
+      containerClassName={css.pagination}
+      activeClassName={css.active}
+      nextLabel="→"
+      previousLabel="←"
       disabledClassName={css.disabled}
       breakClassName={css.break}
       pageLinkClassName={css.pageLink}
